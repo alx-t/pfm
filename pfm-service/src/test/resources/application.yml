@@ -1,0 +1,10 @@
+spring:
+  datasource:
+    url: jdbc:tc:postgresql:16:///pfm?TC_DAEMON=true
+    username: pfm
+    password: pfm
+  jpa:
+    database-platform: org.hibernate.dialect.PostgreSQLDialect
+    hibernate:
+      # ddl-auto: create-drop # пересоздает таблички при перезапуске
+      ddl-auto: update

@@ -1,0 +1,56 @@
+services:
+#  keycloak_db:
+#    container_name: keycloak_db
+#    image: postgres:16
+#    ports:
+#      - "5433:5432"
+#    environment:
+#      POSTGRES_USER: postgres
+#      POSTGRES_PASSWORD: postgres
+#      POSTGRES_DB: keycloak
+#    volumes:
+#      - postgres_data:/var/lib/postgresql/data
+#    networks:
+#      - keycloak-network
+#    restart: unless-stopped
+
+#  keycloak:
+#    container_name: Keycloak
+#    image: quay.io/keycloak/keycloak:latest
+#    ports:
+#      - "9090:8080"
+#    environment:
+#      DB_VENDOR: POSTGRES
+#      DB_ADDR: postgres
+#      DB_DATABASE: keycloak
+#      DB_SCHEMA: public
+#      DB_USER: postgres
+#      DB_PASSWORD: postgres
+#      KEYCLOAK_ADMIN: admin
+#      KEYCLOAK_ADMIN_PASSWORD: admin
+#    networks:
+#      - keycloak-network
+#    depends_on:
+#      - keycloak_db
+#    command:
+#      - "start-dev"
+
+  pfm-db:
+    container_name: pfm_db
+    image: postgres:16
+    ports:
+      - '5434:5432'
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: pfm
+
+#networks:
+#  keycloak-network:
+#    driver: bridge
+
+#volumes:
+#  postgres_data:
+#    driver: local
+#  keycloak:
+#    driver: local
