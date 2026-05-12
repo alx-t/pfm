@@ -38,12 +38,12 @@ class AccountRestControllerTest {
     @Test
     void getProduct_ProductExists_ReturnsProduct() {
         // given
-        var account = new Account(1, "Account 1", AccountType.WALLET,
+        var account = new Account(1L, "Account 1", AccountType.WALLET,
                 Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000));
-        doReturn(Optional.of(account)).when(accountService).findAccount(1);
+        doReturn(Optional.of(account)).when(accountService).findAccount(1L);
 
         // when
-        var result = this.controller.getAccount(1);
+        var result = this.controller.getAccount(1L);
 
         // then
         assertEquals(account, result);
@@ -54,7 +54,7 @@ class AccountRestControllerTest {
         // given
 
         // when
-        var exception = assertThrows(NoSuchElementException.class, () -> this.controller.getAccount(1));
+        var exception = assertThrows(NoSuchElementException.class, () -> this.controller.getAccount(1L));
 
         // then
         assertEquals("errors.account.not_found", exception.getMessage());
@@ -63,7 +63,7 @@ class AccountRestControllerTest {
     @Test
     void findAccount_ReturnsAccount() {
         // given
-        var account = new Account(1, "Account 1", AccountType.WALLET,
+        var account = new Account(1L, "Account 1", AccountType.WALLET,
                 Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000));
 
         // when
@@ -83,13 +83,13 @@ class AccountRestControllerTest {
         var bindingResult = new MapBindingResult(Map.of(), "payload");
 
         // when
-        var result = this.controller.updateAccount(1, payload, bindingResult);
+        var result = this.controller.updateAccount(1L, payload, bindingResult);
 
         // then
         assertNotNull(result);
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
 
-        verify(accountService).updateAccount(1, new UpdateAccountPayload(
+        verify(accountService).updateAccount(1L, new UpdateAccountPayload(
                 "Account 1", AccountType.WALLET,
                 Currency.RUB, BigDecimal.valueOf(1000)
         ));
@@ -106,7 +106,7 @@ class AccountRestControllerTest {
         bindingResult.addError(new FieldError("payload", "title", "error"));
 
         // when
-        var exception = assertThrows(BindException.class, () -> controller.updateAccount(1, payload, bindingResult));
+        var exception = assertThrows(BindException.class, () -> controller.updateAccount(1L, payload, bindingResult));
 
         // then
         assertEquals(List.of(new FieldError("payload", "title", "error")), exception.getAllErrors());
@@ -118,13 +118,13 @@ class AccountRestControllerTest {
         // given
 
         // when
-        var result = controller.deleteAccount(1);
+        var result = controller.deleteAccount(1L);
 
         // then
         assertNotNull(result);
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
 
-        verify(accountService).deleteAccount(1);
+        verify(accountService).deleteAccount(1L);
     }
 
     @Test

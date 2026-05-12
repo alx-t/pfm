@@ -6,7 +6,7 @@ import com.alxt.pfmservice.entity.Currency;
 import java.math.BigDecimal;
 
 public record AccountDTO(
-        Integer id,
+        Long id,
         String title,
         AccountType accountType,
         Currency currency,

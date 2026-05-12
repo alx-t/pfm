@@ -33,14 +33,14 @@ public class AccountServiceImpl implements AccountService {
     }
 
     @Override
-    public Optional<Account> findAccount(Integer accountId) {
+    public Optional<Account> findAccount(Long accountId) {
         return accountRepository.findById(accountId);
     }
 
     // TODO: определиться что обновляем
     @Transactional
     @Override
-    public void updateAccount(Integer accountId, UpdateAccountPayload payload) {
+    public void updateAccount(Long accountId, UpdateAccountPayload payload) {
         accountRepository.findById(accountId)
                 .ifPresentOrElse(account -> {
                     account.setTitle(payload.title());
@@ -56,7 +56,7 @@ public class AccountServiceImpl implements AccountService {
     // TODO: подумать о проверке остатков и пр
     @Override
     @Transactional
-    public void deleteAccount(Integer accountId) {
+    public void deleteAccount(Long accountId) {
         accountRepository.deleteById(accountId);
     }
 }

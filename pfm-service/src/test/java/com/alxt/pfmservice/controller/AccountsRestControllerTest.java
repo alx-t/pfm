@@ -39,9 +39,9 @@ class AccountsRestControllerTest {
         var filter = "account";
         doReturn(
                 List.of(
-                        new Account(1, "Account 1", AccountType.WALLET,
+                        new Account(1L, "Account 1", AccountType.WALLET,
                             Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)),
-                        new Account(2, "Account 2", AccountType.WALLET,
+                        new Account(2L, "Account 2", AccountType.WALLET,
                             Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)))
         ).when(accountService).findAllAccounts("account");
 
@@ -51,9 +51,9 @@ class AccountsRestControllerTest {
         // then
         assertEquals(
                 List.of(
-                        new Account(1, "Account 1", AccountType.WALLET,
+                        new Account(1L, "Account 1", AccountType.WALLET,
                         Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)),
-                        new Account(2, "Account 2", AccountType.WALLET,
+                        new Account(2L, "Account 2", AccountType.WALLET,
                         Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000))
                 ), result);
     }
@@ -68,7 +68,7 @@ class AccountsRestControllerTest {
         var bindingResult = new MapBindingResult(Map.of(), "payload");
         var uriComponentsBuilder = UriComponentsBuilder.fromUriString("http://localhost");
 
-        doReturn(new Account(1, "Account 1", AccountType.WALLET,
+        doReturn(new Account(1L, "Account 1", AccountType.WALLET,
                 Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)))
                 .when(accountService).createAccount(new NewAccountPayload(
                         "Account 1", AccountType.WALLET,
@@ -82,7 +82,7 @@ class AccountsRestControllerTest {
         assertNotNull(result);
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
         assertEquals(URI.create("http://localhost/api/v1/accounts/1"), result.getHeaders().getLocation());
-        assertEquals(new Account(1, "Account 1", AccountType.WALLET,
+        assertEquals(new Account(1L, "Account 1", AccountType.WALLET,
                 Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)
         ), result.getBody());
 

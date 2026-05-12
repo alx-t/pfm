@@ -34,7 +34,7 @@ public class AccountRepositoryIT {
 
         // then
         assertEquals(List.of(new Account(
-                1, "Wallet", AccountType.WALLET,
+                1L, "Wallet", AccountType.WALLET,
                 Currency.RUB, new BigDecimal("1000.000000"), new BigDecimal("1000.000000"))), accounts);
     }
 }

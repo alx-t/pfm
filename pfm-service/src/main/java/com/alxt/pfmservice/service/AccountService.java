@@ -13,9 +13,9 @@ public interface AccountService {
 
     Account createAccount(NewAccountPayload payload);
 
-    Optional<Account> findAccount(Integer accountId);
+    Optional<Account> findAccount(Long accountId);
 
-    void updateAccount(Integer accountId, UpdateAccountPayload payload);
+    void updateAccount(Long accountId, UpdateAccountPayload payload);
 
-    void deleteAccount(Integer accountId);
+    void deleteAccount(Long accountId);
 }

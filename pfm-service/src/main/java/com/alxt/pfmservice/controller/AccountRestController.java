@@ -27,7 +27,7 @@ public class AccountRestController {
     private final MessageSource messageSource;
 
     @ModelAttribute("account")
-    public Account getAccount(@PathVariable Integer accountId) {
+    public Account getAccount(@PathVariable Long accountId) {
         return accountService
                 .findAccount(accountId)
                 .orElseThrow(() -> new NoSuchElementException("errors.account.not_found"));
@@ -40,7 +40,7 @@ public class AccountRestController {
 
     @PatchMapping
     public ResponseEntity<?> updateAccount(
-            @PathVariable Integer accountId,
+            @PathVariable Long accountId,
             @Valid @RequestBody UpdateAccountPayload payload,
             BindingResult bindingResult
     ) throws BindException {
@@ -57,7 +57,7 @@ public class AccountRestController {
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAccount(@PathVariable Integer accountId) {
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId) {
         accountService.deleteAccount(accountId);
         return ResponseEntity.noContent().build();
     }
