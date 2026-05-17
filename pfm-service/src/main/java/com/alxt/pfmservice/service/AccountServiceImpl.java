@@ -18,33 +18,44 @@ public class AccountServiceImpl implements AccountService {
     private final AccountRepository accountRepository;
 
     @Override
-    public Iterable<Account> findAllAccounts(String filter) {
+    public Iterable<Account> findAllAccounts(String userId, String filter) {
         if (filter != null && !filter.isBlank()) {
-            return accountRepository.findAllByTitleLikeIgnoreCase("%"+filter+"%");
+            return accountRepository.findAllByUserIdAndTitleLikeIgnoreCase(userId, "%"+filter+"%");
         } else {
-            return accountRepository.findAll();
+            return accountRepository.findAllByUserId(userId);
         }
     }
 
     @Override
     @Transactional
-    public Account createAccount(NewAccountPayload payload) {
-        return accountRepository.save(payload.toAccount());
+    public Account createAccount(String userId, NewAccountPayload payload) {
+
+        return accountRepository.save(
+                new Account(
+                    null,
+                    payload.title(),
+                    payload.accountType(),
+                    payload.currency(),
+                    payload.amountCurrency(),
+                    payload.amountCurrency(), // TODO: сделать пересчет в валюте
+                    userId
+                )
+        );
     }
 
     @Override
-    public Optional<Account> findAccount(Long accountId) {
-        return accountRepository.findById(accountId);
+    public Optional<Account> findAccount(String userId, Long accountId) {
+        return accountRepository.findByUserIdAndId(userId, accountId);
     }
 
     // TODO: определиться что обновляем
     @Transactional
     @Override
-    public void updateAccount(Long accountId, UpdateAccountPayload payload) {
-        accountRepository.findById(accountId)
+    public void updateAccount(String userId, Long accountId, UpdateAccountPayload payload) {
+        accountRepository.findByUserIdAndId(userId, accountId)
                 .ifPresentOrElse(account -> {
                     account.setTitle(payload.title());
-                    account.setAccountType(payload.accountType());
+//                    account.setAccountType(payload.accountType());
 //                    account.setCurrency(payload.currency());
 //                    account.setAmount(payload.amountCurrency());
 //                    account.setAmountCurrency(payload.amountCurrency());
@@ -56,7 +67,7 @@ public class AccountServiceImpl implements AccountService {
     // TODO: подумать о проверке остатков и пр
     @Override
     @Transactional
-    public void deleteAccount(Long accountId) {
-        accountRepository.deleteById(accountId);
+    public void deleteAccount(String userId, Long accountId) {
+        accountRepository.deleteByUserIdAndId(userId, accountId);
     }
 }

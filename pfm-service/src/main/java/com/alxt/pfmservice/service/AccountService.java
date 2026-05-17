@@ -9,13 +9,13 @@ import java.util.Optional;
 // TODO перегнать в ДТО-шки
 public interface AccountService {
 
-    Iterable<Account> findAllAccounts(String filter);
+    Iterable<Account> findAllAccounts(String userId, String filter);
 
-    Account createAccount(NewAccountPayload payload);
+    Account createAccount(String userId, NewAccountPayload payload);
 
-    Optional<Account> findAccount(Long accountId);
+    Optional<Account> findAccount(String userId, Long accountId);
 
-    void updateAccount(Long accountId, UpdateAccountPayload payload);
+    void updateAccount(String userId, Long accountId, UpdateAccountPayload payload);
 
-    void deleteAccount(Long accountId);
+    void deleteAccount(String userId, Long accountId);
 }

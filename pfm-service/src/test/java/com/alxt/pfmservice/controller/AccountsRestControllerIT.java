@@ -6,11 +6,13 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;
 
@@ -27,7 +29,10 @@ public class AccountsRestControllerIT {
     void findAccounts_ReturnsAccountsList() throws Exception {
         // given
         var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts")
-                .param("filter", "account");
+                .param("filter", "account")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -39,16 +44,26 @@ public class AccountsRestControllerIT {
                         content().json("""
                                 [
                                     {"id": 2, "title": "Account 2", "accountType": "WALLET", "currency": "RUB",
-                                      "amount": 2000.0, "amountCurrency": 2000.0},
-                                    {"id": 4, "title": "Account 4", "accountType": "DEPOSIT", "currency": "RUB",
-                                      "amount": 4000.0, "amountCurrency": 4000.0}
+                                      "amount": 2000.0, "amountCurrency": 2000.0}
                                 ]""")
                 );
     }
 
-//    @Test
-//    @Sql("/sql/accounts.sql")
-//    void findAccounts_UserIsNotAuthorized_ReturnsForbidden() throws Exception {}
+    @Test
+    @Sql("/sql/accounts.sql")
+    void findAccounts_UserIsNotAuthorized_ReturnsUnauthorized() throws Exception {
+        // given
+        var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts")
+                .param("filter", "account");
+
+        // when
+        this.mockMvc.perform(requestBuilder)
+                // then
+                .andDo(print())
+                .andExpectAll(
+                        status().isUnauthorized()
+                );
+    }
 
     @Test
     void createAccount_RequestIsValid_ReturnsNewAccount() throws Exception {
@@ -56,7 +71,10 @@ public class AccountsRestControllerIT {
         var requestBuilder = MockMvcRequestBuilders.post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"title": "Account 1", "accountType": 0, "currency": "RUB", "amountCurrency": 1000}""");
+                        {"title": "Account 1", "accountType": 0, "currency": "RUB", "amountCurrency": 1000}""")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -73,7 +91,8 @@ public class AccountsRestControllerIT {
                                     "accountType": "WALLET",
                                     "currency": "RUB",
                                      "amount": 1000.0,
-                                     "amountCurrency": 1000.0
+                                     "amountCurrency": 1000.0,
+                                     "userId": "User_1"
                                 }"""));
     }
 
@@ -84,7 +103,10 @@ public class AccountsRestControllerIT {
         var requestBuilder = MockMvcRequestBuilders.post("/api/v1/accounts")
                 .contentType(MediaType.APPLICATION_JSON)
                 .content("""
-                        {"title": "  ", "accountType": 0, "currency": "RUB", "amountCurrency": 1000}""");
+                        {"title": "  ", "accountType": 0, "currency": "RUB", "amountCurrency": 1000}""")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1")) // Set Subject claim
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -101,6 +123,20 @@ public class AccountsRestControllerIT {
                                 }"""));
     }
 
-//    @Test
-//    void createAccount_UserIsNotAuthorized_ReturnsForbidden() throws Exception {}
+    @Test
+    void createAccount_UserIsNotAuthorized_ReturnsUnauthorized() throws Exception {
+        // given
+        var requestBuilder = MockMvcRequestBuilders.post("/api/v1/accounts")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("""
+                        {"title": "  ", "accountType": 0, "currency": "RUB", "amountCurrency": 1000}""");
+
+        // when
+        this.mockMvc.perform(requestBuilder)
+                // then
+                .andDo(print())
+                .andExpectAll(
+                        status().isUnauthorized()
+                );
+    }
 }

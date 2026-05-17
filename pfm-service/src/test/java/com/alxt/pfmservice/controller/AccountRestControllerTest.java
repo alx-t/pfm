@@ -1,5 +1,6 @@
 package com.alxt.pfmservice.controller;
 
+import com.alxt.pfmservice.controller.v1.AccountRestController;
 import com.alxt.pfmservice.entity.Account;
 import com.alxt.pfmservice.entity.AccountType;
 import com.alxt.pfmservice.entity.Currency;
@@ -13,6 +14,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.BindException;
 import org.springframework.validation.FieldError;
 import org.springframework.validation.MapBindingResult;
@@ -35,15 +38,22 @@ class AccountRestControllerTest {
     @InjectMocks
     AccountRestController controller;
 
+    String userId = "User_1";
+    JwtAuthenticationToken jwt = new JwtAuthenticationToken(Jwt.withTokenValue("token")
+            .header("alg", "none")
+            .claim("sub", userId)
+            .build());
+
     @Test
     void getProduct_ProductExists_ReturnsProduct() {
         // given
         var account = new Account(1L, "Account 1", AccountType.WALLET,
-                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000));
-        doReturn(Optional.of(account)).when(accountService).findAccount(1L);
+                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), userId);
+
+        doReturn(Optional.of(account)).when(accountService).findAccount(userId, 1L);
 
         // when
-        var result = this.controller.getAccount(1L);
+        var result = this.controller.getAccount(1L, jwt);
 
         // then
         assertEquals(account, result);
@@ -54,7 +64,7 @@ class AccountRestControllerTest {
         // given
 
         // when
-        var exception = assertThrows(NoSuchElementException.class, () -> this.controller.getAccount(1L));
+        var exception = assertThrows(NoSuchElementException.class, () -> this.controller.getAccount(1L, jwt));
 
         // then
         assertEquals("errors.account.not_found", exception.getMessage());
@@ -64,7 +74,7 @@ class AccountRestControllerTest {
     void findAccount_ReturnsAccount() {
         // given
         var account = new Account(1L, "Account 1", AccountType.WALLET,
-                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000));
+                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), userId);
 
         // when
         var result = this.controller.findAccount(account);
@@ -83,13 +93,13 @@ class AccountRestControllerTest {
         var bindingResult = new MapBindingResult(Map.of(), "payload");
 
         // when
-        var result = this.controller.updateAccount(1L, payload, bindingResult);
+        var result = this.controller.updateAccount(1L, payload, bindingResult, jwt);
 
         // then
         assertNotNull(result);
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
 
-        verify(accountService).updateAccount(1L, new UpdateAccountPayload(
+        verify(accountService).updateAccount(userId, 1L, new UpdateAccountPayload(
                 "Account 1", AccountType.WALLET,
                 Currency.RUB, BigDecimal.valueOf(1000)
         ));
@@ -106,7 +116,7 @@ class AccountRestControllerTest {
         bindingResult.addError(new FieldError("payload", "title", "error"));
 
         // when
-        var exception = assertThrows(BindException.class, () -> controller.updateAccount(1L, payload, bindingResult));
+        var exception = assertThrows(BindException.class, () -> controller.updateAccount(1L, payload, bindingResult, jwt));
 
         // then
         assertEquals(List.of(new FieldError("payload", "title", "error")), exception.getAllErrors());
@@ -118,13 +128,13 @@ class AccountRestControllerTest {
         // given
 
         // when
-        var result = controller.deleteAccount(1L);
+        var result = controller.deleteAccount(1L, jwt);
 
         // then
         assertNotNull(result);
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
 
-        verify(accountService).deleteAccount(1L);
+        verify(accountService).deleteAccount(userId, 1L);
     }
 
     @Test

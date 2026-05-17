@@ -1,8 +1,9 @@
-package com.alxt.pfmservice.controller;
+package com.alxt.pfmservice.controller.v1;
 
 import com.alxt.pfmservice.entity.Account;
 import com.alxt.pfmservice.entity.payload.UpdateAccountPayload;
 import com.alxt.pfmservice.service.AccountService;
+import com.alxt.pfmservice.utils.UserUtils;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -10,10 +11,13 @@ import org.springframework.context.MessageSource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal;
 import java.util.Locale;
 import java.util.NoSuchElementException;
 
@@ -27,9 +31,12 @@ public class AccountRestController {
     private final MessageSource messageSource;
 
     @ModelAttribute("account")
-    public Account getAccount(@PathVariable Long accountId) {
+    public Account getAccount(
+            @PathVariable Long accountId,
+            JwtAuthenticationToken auth
+    ) {
         return accountService
-                .findAccount(accountId)
+                .findAccount(UserUtils.getUserId(auth), accountId)
                 .orElseThrow(() -> new NoSuchElementException("errors.account.not_found"));
     }
 
@@ -42,7 +49,8 @@ public class AccountRestController {
     public ResponseEntity<?> updateAccount(
             @PathVariable Long accountId,
             @Valid @RequestBody UpdateAccountPayload payload,
-            BindingResult bindingResult
+            BindingResult bindingResult,
+            JwtAuthenticationToken auth
     ) throws BindException {
         if (bindingResult.hasErrors()) {
             if (bindingResult instanceof BindException exception) {
@@ -51,14 +59,14 @@ public class AccountRestController {
                 throw new BindException(bindingResult);
             }
         } else {
-            accountService.updateAccount(accountId, payload);
+            accountService.updateAccount(UserUtils.getUserId(auth), accountId, payload);
             return ResponseEntity.noContent().build();
         }
     }
 
     @DeleteMapping
-    public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId) {
-        accountService.deleteAccount(accountId);
+    public ResponseEntity<Void> deleteAccount(@PathVariable Long accountId, JwtAuthenticationToken auth) {
+        accountService.deleteAccount(UserUtils.getUserId(auth), accountId);
         return ResponseEntity.noContent().build();
     }
 

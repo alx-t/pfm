@@ -10,6 +10,21 @@ spring:
       ddl-auto: update
     database-platform: org.hibernate.dialect.PostgreSQLDialect
     show-sql: true
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: http://localhost:9090/realms/PFM
+#      client:
+#        provider:
+#          keycloak:
+#            issuer-uri: http://localhost:9090/realms/PFM
+#            user-name-attribute: preferred_username
+#        registration:
+#          keycloak:
+#            client-id: pfm-app
+#            client-secret: FLGr2mjefTJO20VcNll8C7yE2fnqvaNc
+#            scope: openid
 #  flyway:
 server:
   port: 8081

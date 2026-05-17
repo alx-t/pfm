@@ -30,11 +30,11 @@ public class AccountRepositoryIT {
         var filter = "%wallet%";
 
         // when
-        var accounts = accountRepository.findAllByTitleLikeIgnoreCase(filter);
+        var accounts = accountRepository.findAllByUserIdAndTitleLikeIgnoreCase("User_1", filter);
 
         // then
         assertEquals(List.of(new Account(
-                1L, "Wallet", AccountType.WALLET,
-                Currency.RUB, new BigDecimal("1000.000000"), new BigDecimal("1000.000000"))), accounts);
+                1L, "Wallet", AccountType.WALLET, Currency.RUB,
+                new BigDecimal("1000.000000"), new BigDecimal("1000.000000"), "User_1")), accounts);
     }
 }
