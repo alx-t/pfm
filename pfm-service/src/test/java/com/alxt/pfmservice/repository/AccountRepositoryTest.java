@@ -27,6 +27,7 @@ class AccountRepositoryTest {
         account.setCurrency(Currency.RUB);
         account.setAmount(BigDecimal.valueOf(1000));
         account.setAmountCurrency(BigDecimal.valueOf(1000));
+        account.setUserId("TestUser");
 
         Account savedAccount = accountRepository.save(account);
 

@@ -10,6 +10,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.transaction.annotation.Transactional;
 
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
@@ -26,7 +27,10 @@ public class AccountRestControllerIT {
     @Sql("/sql/accounts.sql")
     void findAccount_AccountExists_ReturnsAccountsList() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts/1");
+        var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts/1")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -50,7 +54,10 @@ public class AccountRestControllerIT {
     @Test
     void findAccount_AccountDoesNotExist_ReturnsNotFound() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts/1");
+        var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts/1")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -61,9 +68,20 @@ public class AccountRestControllerIT {
                 );
     }
 
-//    @Test
-//    @Sql("/sql/accounts.sql")
-//    void findAccount_UserIsNotAuthorized_ReturnsForbidden() throws Exception {}
+    @Test
+    @Sql("/sql/accounts.sql")
+    void findAccount_UserIsNotAuthorized_ReturnsUnauthorized() throws Exception {
+        // given
+        var requestBuilder = MockMvcRequestBuilders.get("/api/v1/accounts/1");
+
+        // when
+        this.mockMvc.perform(requestBuilder)
+                // then
+                .andDo(print())
+                .andExpectAll(
+                        status().isUnauthorized()
+                );
+    }
 
     @Test
     @Sql("/sql/accounts.sql")
@@ -77,7 +95,10 @@ public class AccountRestControllerIT {
                             "accountType": 0,
                             "currency": "RUB",
                             "amountCurrency": 1000
-                        }""");
+                        }""")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -88,7 +109,6 @@ public class AccountRestControllerIT {
                 );
     }
 
-    // TODO: проблемы с обновлением
     @Test
     @Sql("/sql/accounts.sql")
     void updateAccount_RequestIsInvalid_ReturnsBadRequest() throws Exception {
@@ -101,7 +121,10 @@ public class AccountRestControllerIT {
                             "accountType": 0,
                             "currency": "RUB",
                             "amountCurrency": 1000
-                        }""");
+                        }""")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -128,7 +151,10 @@ public class AccountRestControllerIT {
                             "accountType": 0,
                             "currency": "RUB",
                             "amountCurrency": 1000
-                        }""");
+                        }""")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -139,14 +165,14 @@ public class AccountRestControllerIT {
                 );
     }
 
-//    @Test
-//    void updateAccount_UserIsNotAuthorized_ReturnsForbidden() throws Exception {}
-
     @Test
     @Sql("/sql/accounts.sql")
     void deleteAccount_AccountExists_ReturnsNoContent() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders.delete("/api/v1/accounts/1");
+        var requestBuilder = MockMvcRequestBuilders.delete("/api/v1/accounts/1")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -160,7 +186,10 @@ public class AccountRestControllerIT {
     @Test
     void deleteAccount_AccountDoesNotExist_ReturnsNotFound() throws Exception {
         // given
-        var requestBuilder = MockMvcRequestBuilders.delete("/api/v1/accounts/1");
+        var requestBuilder = MockMvcRequestBuilders.delete("/api/v1/accounts/1")
+                .with(jwt()
+                        .jwt(jwt -> jwt.claim("sub", "User_1"))
+                );
 
         // when
         this.mockMvc.perform(requestBuilder)
@@ -170,7 +199,4 @@ public class AccountRestControllerIT {
                         status().isNotFound()
                 );
     }
-
-//    @Test
-//    void deleteAccount_UserIsNotAuthorized_ReturnsForbidden() throws Exception {}
 }

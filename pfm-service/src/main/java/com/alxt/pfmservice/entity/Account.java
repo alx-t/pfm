@@ -15,6 +15,12 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 @Table(name = "accounts")
+@NamedQueries(
+        @NamedQuery(
+                name = "Account.findAllByUserIdAndTitleLikeIgniringCase",
+                query = "select a from Account a where a.userId = :userId and a.title ilike :filter"
+        )
+)
 public class Account {
 
     @Id
@@ -43,6 +49,11 @@ public class Account {
     @Column(name = "amount_curr", precision = 15, scale = 6)
     @NotNull
     private BigDecimal amountCurrency;
+
+    @Column(name = "user_id")
+    @NotNull
+    @Size(max = 36)
+    private String userId;
 
     public AccountDTO toDTO() {
         return new AccountDTO(getId(), getTitle(), getAccountType(), getCurrency(), getAmount(), getAmountCurrency());
