@@ -4,6 +4,9 @@ import com.alxt.pfmservice.entity.Account;
 import com.alxt.pfmservice.entity.payload.NewAccountPayload;
 import com.alxt.pfmservice.service.AccountService;
 import com.alxt.pfmservice.utils.UserUtils;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +24,10 @@ import java.util.Map;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("api/v1/accounts")
+@Tag(
+        name = "Счета",
+        description = "Ручки для работы со счетами"
+)
 public class AccountsRestController {
 
     private final AccountService accountService;
@@ -28,16 +35,18 @@ public class AccountsRestController {
     // TODO: Вернуть DTO
 
     @GetMapping
+    @Operation(summary = "Получить информацию о счетах")
     public Iterable<Account> findAccounts(
-            @RequestParam(name = "filter", required = false) String filter,
+            @Parameter(description = "фильтр") @RequestParam(name = "filter", required = false) String filter,
             JwtAuthenticationToken auth
     ) {
         return accountService.findAllAccounts(UserUtils.getUserId(auth), filter);
     }
 
     @PostMapping
+    @Operation(summary = "Создать новый счет")
     public ResponseEntity<?> createAccount(
-            @Valid @RequestBody NewAccountPayload payload,
+            @Parameter(description = "Данные для создания нового счета") @Valid @RequestBody NewAccountPayload payload,
             BindingResult bindingResult,
             UriComponentsBuilder uriComponentsBuilder,
             JwtAuthenticationToken auth
