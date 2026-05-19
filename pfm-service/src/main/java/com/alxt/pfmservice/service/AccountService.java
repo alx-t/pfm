@@ -1,19 +1,21 @@
 package com.alxt.pfmservice.service;
 
 import com.alxt.pfmservice.entity.Account;
+import com.alxt.pfmservice.entity.dto.AccountDTO;
 import com.alxt.pfmservice.entity.payload.NewAccountPayload;
 import com.alxt.pfmservice.entity.payload.UpdateAccountPayload;
 
+import java.util.List;
 import java.util.Optional;
 
 // TODO перегнать в ДТО-шки
 public interface AccountService {
 
-    Iterable<Account> findAllAccounts(String userId, String filter);
+    List<AccountDTO> findAllAccounts(String userId, String filter);
 
-    Account createAccount(String userId, NewAccountPayload payload);
+    AccountDTO createAccount(String userId, NewAccountPayload payload);
 
-    Optional<Account> findAccount(String userId, Long accountId);
+    Optional<AccountDTO> findAccount(String userId, Long accountId);
 
     void updateAccount(String userId, Long accountId, UpdateAccountPayload payload);
 

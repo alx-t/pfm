@@ -4,23 +4,23 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.math.BigDecimal;
-
 @Data
+@Builder
 @Entity
 @NoArgsConstructor
 @AllArgsConstructor
-@Table(name = "accounts")
+@Table(name = "categories")
 @NamedQueries(
         @NamedQuery(
-                name = "Account.findAllByUserIdAndTitleLikeIgniringCase",
-                query = "select a from Account a where a.userId = :userId and a.title ilike :filter"
+                name = "Category.findAllByUserIdAndTitleLikeIgniringCase",
+                query = "select c from Category c where c.userId = :userId and c.title ilike :filter"
         )
 )
-public class Account {
+public class Category {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -32,22 +32,9 @@ public class Account {
     @Size(min = 3, max = 50)
     private String title;
 
-    @Column(name = "acc_type")
+    @Column(name = "operation_type")
     @NotNull
-    private AccountType accountType;
-
-    @Enumerated(EnumType.STRING)
-    @Column(name = "currency")
-    @NotNull
-    private Currency currency;
-
-    @Column(name = "amount", precision = 15, scale = 6)
-    @NotNull
-    private BigDecimal amount;
-
-    @Column(name = "amount_curr", precision = 15, scale = 6)
-    @NotNull
-    private BigDecimal amountCurrency;
+    private OperationType operationType;
 
     @Column(name = "user_id")
     @NotNull

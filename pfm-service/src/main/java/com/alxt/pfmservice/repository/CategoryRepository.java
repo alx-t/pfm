@@ -1,6 +1,6 @@
 package com.alxt.pfmservice.repository;
 
-import com.alxt.pfmservice.entity.Account;
+import com.alxt.pfmservice.entity.Category;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -9,19 +9,19 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface AccountRepository extends JpaRepository<Account, Long> {
+public interface CategoryRepository extends JpaRepository<Category, Long> {
 
-    @Query(name = "Account.findAllByUserIdAndTitleLikeIgniringCase")
-    List<Account> findAllByUserIdAndTitleLikeIgnoreCase(
+    @Query(name = "Category.findAllByUserIdAndTitleLikeIgniringCase")
+    List<Category> findAllByUserIdAndTitleLikeIgnoreCase(
             @Param("userId") String userId,
             @Param("filter") String filter
     );
 
-    List<Account> findAllByUserId(@Param("userId") String userId);
+    List<Category> findAllByUserId(@Param("userId") String userId);
 
-    Optional<Account> findByUserIdAndId(@Param("userId") String userId, @Param("id") Long id);
+    Optional<Category> findByUserIdAndId(@Param("userId") String userId, @Param("id") Long id);
 
     @Modifying
-    @Query("delete from Account a where a.userId = :userId and a.id = :id")
+    @Query("delete from Category c where c.userId = :userId and c.id = :id")
     void deleteByUserIdAndId(@Param("userId") String userId, @Param("id") Long id);
 }
