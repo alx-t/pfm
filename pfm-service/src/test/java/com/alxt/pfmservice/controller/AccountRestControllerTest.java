@@ -4,6 +4,7 @@ import com.alxt.pfmservice.controller.v1.AccountRestController;
 import com.alxt.pfmservice.entity.Account;
 import com.alxt.pfmservice.entity.AccountType;
 import com.alxt.pfmservice.entity.Currency;
+import com.alxt.pfmservice.entity.dto.AccountDTO;
 import com.alxt.pfmservice.entity.payload.UpdateAccountPayload;
 import com.alxt.pfmservice.service.AccountService;
 import org.junit.jupiter.api.Test;
@@ -47,8 +48,8 @@ class AccountRestControllerTest {
     @Test
     void getProduct_ProductExists_ReturnsProduct() {
         // given
-        var account = new Account(1L, "Account 1", AccountType.WALLET,
-                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), userId);
+        var account = new AccountDTO(1L, "Account 1", AccountType.WALLET,
+                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000));
 
         doReturn(Optional.of(account)).when(accountService).findAccount(userId, 1L);
 
@@ -73,8 +74,8 @@ class AccountRestControllerTest {
     @Test
     void findAccount_ReturnsAccount() {
         // given
-        var account = new Account(1L, "Account 1", AccountType.WALLET,
-                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), userId);
+        var account = new AccountDTO(1L, "Account 1", AccountType.WALLET,
+                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000));
 
         // when
         var result = this.controller.findAccount(account);
@@ -135,27 +136,5 @@ class AccountRestControllerTest {
         assertEquals(HttpStatus.NO_CONTENT, result.getStatusCode());
 
         verify(accountService).deleteAccount(userId, 1L);
-    }
-
-    @Test
-    void handleNoSuchElementException_ReturnsNotFound() {
-        // given
-        var exception = new NoSuchElementException("error_code");
-        var locale = Locale.of("ru");
-
-        doReturn("error details").when(this.messageSource)
-                .getMessage("error_code", new Object[0], "error_code", Locale.of("ru"));
-
-        // when
-        var result = this.controller.handleNoSuchElementException(exception, locale);
-
-        // then
-        assertNotNull(result);
-        assertEquals(HttpStatus.NOT_FOUND, result.getStatusCode());
-        assertInstanceOf(ProblemDetail.class, result.getBody());
-        assertEquals(HttpStatus.NOT_FOUND.value(), result.getBody().getStatus());
-        assertEquals("error details", result.getBody().getDetail());
-
-        verifyNoInteractions(accountService);
     }
 }

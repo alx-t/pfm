@@ -4,6 +4,7 @@ import com.alxt.pfmservice.controller.v1.AccountsRestController;
 import com.alxt.pfmservice.entity.Account;
 import com.alxt.pfmservice.entity.AccountType;
 import com.alxt.pfmservice.entity.Currency;
+import com.alxt.pfmservice.entity.dto.AccountDTO;
 import com.alxt.pfmservice.entity.payload.NewAccountPayload;
 import com.alxt.pfmservice.service.AccountService;
 import org.junit.jupiter.api.Test;
@@ -78,8 +79,8 @@ class AccountsRestControllerTest {
         var bindingResult = new MapBindingResult(Map.of(), "payload");
         var uriComponentsBuilder = UriComponentsBuilder.fromUriString("http://localhost");
 
-        doReturn(new Account(1L, "Account 1", AccountType.WALLET,
-                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), userId))
+        doReturn(new AccountDTO(1L, "Account 1", AccountType.WALLET,
+                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)))
                 .when(accountService).createAccount(userId, new NewAccountPayload(
                         "Account 1", AccountType.WALLET,
                         Currency.RUB, BigDecimal.valueOf(1000)
@@ -92,8 +93,8 @@ class AccountsRestControllerTest {
         assertNotNull(result);
         assertEquals(HttpStatus.CREATED, result.getStatusCode());
         assertEquals(URI.create("http://localhost/api/v1/accounts/1"), result.getHeaders().getLocation());
-        assertEquals(new Account(1L, "Account 1", AccountType.WALLET,
-                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000), userId
+        assertEquals(new AccountDTO(1L, "Account 1", AccountType.WALLET,
+                Currency.RUB, BigDecimal.valueOf(1000), BigDecimal.valueOf(1000)
         ), result.getBody());
 
         verify(accountService).createAccount(userId, payload);
